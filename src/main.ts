@@ -16,6 +16,8 @@ export default class DailyTaskPlugin extends Plugin {
     // 任务生成器
     taskGenerator: TaskGenerator;
 
+    private timeoutId: NodeJS.Timeout | null = null;
+
     /**
      * 插件加载时调用
      */
@@ -57,6 +59,9 @@ export default class DailyTaskPlugin extends Plugin {
      */
     onunload() {
         // 插件卸载清理工作
+        if(this.timeoutId) {
+            clearTimeout(this.timeoutId);
+        }
     }
     
     /**
@@ -64,24 +69,46 @@ export default class DailyTaskPlugin extends Plugin {
      */
     private async checkAutoGenerate() {
         const settings = this.settingsManager.getSettings();
-        
-        switch (settings.autoGenerateMode) {
-            case AutoGenerateMode.DAILY:
-                // 每天自动生成（静默模式，不打开文件）
-                await this.taskGenerator.generateDailyTask(false, true);
-                break;
-                
-            case AutoGenerateMode.WORKDAY:
-                // 工作日自动生成（静默模式，不打开文件）
-                if (isWorkday()) {
+        const targetHour = settings.scheduledHour || 9;
+        const targetMinute = settings.scheduledMinute || 0;
+
+        const timeBetween = this.getMillisecondsUntilNextRun(targetHour, targetMinute);
+
+        this.timeoutId = setTimeout(async () => {
+            console.log('执行定时任务：', new Date().toLocaleDateString);
+            switch (settings.autoGenerateMode) {
+                case AutoGenerateMode.DAILY:
+                    // 每天自动生成（静默模式，不打开文件）
                     await this.taskGenerator.generateDailyTask(false, true);
-                }
-                break;
-                
-            case AutoGenerateMode.NONE:
-            default:
-                // 不自动生成
-                break;
+                    break;
+                    
+                case AutoGenerateMode.WORKDAY:
+                    // 工作日自动生成（静默模式，不打开文件）
+                    if (isWorkday()) {
+                        await this.taskGenerator.generateDailyTask(false, true);
+                    }
+                    break;
+                    
+                case AutoGenerateMode.NONE:
+                default:
+                    // 不自动生成
+                    break;
+            }
+        }, timeBetween);
+        
+        console.log('定时任务已设置，下次执行时间：', new Date(Date.now() + timeBetween).toLocaleString());
+    }
+
+    private getMillisecondsUntilNextRun(targetHour: number, targetMinute: number): number {
+        const now = new Date();
+        const nextRun = new Date();
+
+        nextRun.setHours(targetHour, targetMinute, 0, 0);
+
+        if( nextRun < now) {
+            nextRun.setDate(nextRun.getDate() + 1);
         }
+
+        return nextRun.getTime() - now.getTime();
     }
 } 

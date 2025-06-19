@@ -229,6 +229,165 @@ export class DailyTaskSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
+
+        // 定时执行时间设置
+        new Setting(containerEl)
+            .setName(getTranslation('settings.scheduledTime'))
+            .setDesc(getTranslation('settings.scheduledTime.desc'))
+            .setClass('scheduled-time-setting').addText(hourText => {
+                hourText
+                    .setValue(settings.scheduledHour.toString())
+                    .onChange(async (value) => {
+                        const hour = parseInt(value);
+                        if (!isNaN(hour) && hour >= 0 && hour <= 23) {
+                            await this.settingsManager.updateSettings({ scheduledHour: hour });
+                        }
+                    });
+                
+                // 设置输入框属性
+                hourText.inputEl.type = 'number';
+                hourText.inputEl.min = '0';
+                hourText.inputEl.max = '23';
+                hourText.inputEl.style.width = '60px';
+                hourText.inputEl.style.textAlign = 'center';
+                hourText.inputEl.placeholder = '9';
+                
+                // 添加标签
+                const hourLabel = document.createElement('span');
+                hourLabel.textContent = getTranslation('settings.hour');
+                hourLabel.style.marginRight = '8px';
+                hourText.inputEl.parentElement?.insertBefore(hourLabel, hourText.inputEl);
+                
+                return hourText;
+            })
+            .addText(minuteText => {
+                minuteText
+                    .setValue(settings.scheduledMinute.toString())
+                    .onChange(async (value) => {
+                        const minute = parseInt(value);
+                        if (!isNaN(minute) && minute >= 0 && minute <= 59) {
+                            await this.settingsManager.updateSettings({ scheduledMinute: minute });
+                        }
+                    });
+                
+                // 设置输入框属性
+                minuteText.inputEl.type = 'number';
+                minuteText.inputEl.min = '0';
+                minuteText.inputEl.max = '59';
+                minuteText.inputEl.style.width = '60px';
+                minuteText.inputEl.style.textAlign = 'center';
+                minuteText.inputEl.placeholder = '0';
+                
+                // 添加冒号和标签
+                const separator = document.createElement('span');
+                separator.textContent = ' : ';
+                separator.style.margin = '0 8px';
+                minuteText.inputEl.parentElement?.insertBefore(separator, minuteText.inputEl);
+                
+                const minuteLabel = document.createElement('span');
+                minuteLabel.textContent = getTranslation('settings.minute');
+                minuteLabel.style.marginLeft = '8px';
+                minuteText.inputEl.parentElement?.appendChild(minuteLabel);
+                
+                return minuteText;
+            });
+            
+        // 创建时间输入容器
+        const timeContainer = document.createElement('div');
+        timeContainer.classList.add('time-input-container');
+
+        // 小时输入
+        const hourContainer = document.createElement('div');
+        hourContainer.classList.add('time-input-group');
+
+        const hourLabel = document.createElement('label');
+        hourLabel.textContent = getTranslation('settings.hour');
+        hourLabel.classList.add('time-input-label');
+        hourLabel.style.marginRight = '8px';
+        hourContainer.appendChild(hourLabel);
+
+        const hourInput = new TextComponent(hourContainer)
+            .setValue(settings.scheduledHour.toString())
+            .onChange(async (value) => {
+                const hour = parseInt(value);
+                if(!isNaN(hour) && hour >= 0 && hour <= 23) {
+                    await this.settingsManager.updateSettings({ scheduledHour: hour });
+                }
+            });
+
+        hourInput.inputEl.type = 'number';
+        hourInput.inputEl.min = '0';
+        hourInput.inputEl.max = '23';
+        hourInput.inputEl.classList.add('time-input');
+        hourInput.inputEl.placeholder = '9';
+        hourInput.inputEl.style.width = '60px';
+        hourInput.inputEl.style.textAlign = 'center';
+
+        hourInput.inputEl.parentElement?.insertBefore(hourLabel, hourInput.inputEl);
+
+        // 分钟输入
+        const minuteContainer = document.createElement('div');
+        minuteContainer.classList.add('time-input-group');
+
+        const minuteLabel = document.createElement('label');
+        minuteLabel.textContent = getTranslation('settings.minute');
+        minuteLabel.classList.add('time-input-label');
+        minuteContainer.appendChild(minuteLabel);
+
+        const minuteInput = new TextComponent(minuteContainer)
+            .setValue(settings.scheduledMinute.toString())
+            .onChange(async (value) => {
+                const minute = parseInt(value);
+                if(!isNaN(minute) && minute >= 0 && minute <= 59) {
+                    await this.settingsManager.updateSettings({ scheduledMinute: minute });
+                }
+            });
+
+        minuteInput.inputEl.type = 'number';
+        minuteInput.inputEl.min = '0';
+        minuteInput.inputEl.max = '59';
+        minuteInput.inputEl.style.width = '60px';
+        minuteInput.inputEl.style.textAlign = 'center';
+        minuteInput.inputEl.classList.add('time-input');
+        minuteInput.inputEl.placeholder = '0';
+
+        // 时间显示
+        const timeDisplay = document.createElement('div');
+        timeDisplay.classList.add('time-display');
+        const updateTimeDisplay = () => {
+            const hour = settings.scheduledHour.toString().padStart(2, '0');
+            const minute = settings.scheduledMinute.toString().padStart(2, '0');
+            timeDisplay.textContent = `${hour}:${minute}`;
+        };
+        updateTimeDisplay();
+
+        // 更新时间显示的函数
+        const updateDisplay = () => {
+            setTimeout(updateTimeDisplay, 100);
+        };
+
+        // 为输入框添加事件监听器以更新显示
+        hourInput.onChange(async (value) => {
+            const hour = parseInt(value);
+            if (!isNaN(hour) && hour >= 0 && hour <= 23) {
+                await this.settingsManager.updateSettings({ scheduledHour: hour });
+                updateDisplay();
+            }
+        });
+
+        minuteInput.onChange(async (value) => {
+            const minute = parseInt(value);
+            if (!isNaN(minute) && minute >= 0 && minute <= 59) {
+                await this.settingsManager.updateSettings({ scheduledMinute: minute });
+                updateDisplay();
+            }
+        });
+
+        // 组装容器添加到设置项
+        const timeSettingEl = containerEl.querySelector('.scheduled-time-setting .setting-item-control');
+        if (timeSettingEl) {
+            timeSettingEl.appendChild(timeContainer);
+        }
         
         // 通知显示时间
         new Setting(containerEl)
@@ -504,6 +663,7 @@ export class DailyTaskSettingTab extends PluginSettingTab {
         const calendarIcon = document.createElement('span');
         calendarIcon.classList.add('svg-icon', 'lucide-calendar-plus');
         this.addTaskButton.buttonEl.prepend(calendarIcon);
+
     }
     
     /**

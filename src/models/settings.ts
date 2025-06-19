@@ -40,6 +40,12 @@ export interface DailyTaskSettings {
 
     // UI配置
     successNotificationDuration: number; // 成功通知显示时间(毫秒)
+
+    // 默认开始时间（小时）
+    scheduledHour: number;
+
+    // 默认开始时间（分钟）
+    scheduledMinute: number;
 }
 
 /**
@@ -92,5 +98,7 @@ export const DEFAULT_SETTINGS: DailyTaskSettings = {
     customTemplate: '', // 默认为空，表示使用语言相关的默认模板
     hasCustomTemplate: false, // 默认不使用自定义模板
     taskStatistics: false, // 默认关闭任务统计功能
-    successNotificationDuration: 3000
+    successNotificationDuration: 3000,
+    scheduledHour: 9,
+    scheduledMinute: 0
 }; 

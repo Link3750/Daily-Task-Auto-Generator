@@ -33,6 +33,10 @@ export type TranslationKey =
     | 'settings.resetToDefault'
     | 'settings.notificationDuration'
     | 'settings.notificationDuration.desc'
+    | 'settings.scheduledTime'
+    | 'settings.scheduledTime.desc'
+    | 'settings.hour'
+    | 'settings.minute'
     | 'settings.preview'
     | 'template.dateWithIcon'
     
@@ -166,6 +170,10 @@ const translationsZH: Record<TranslationKey, string> = {
     'template.dateWithIcon': '带图标的当前日期',
     'settings.basicSettings': '基本设置',
     'settings.templateSettings': '模板设置',
+    'settings.scheduledTime': '定时执行时间',
+    'settings.scheduledTime.desc': '⏰ 设置每日自动生成任务的具体时间',
+    'settings.hour': '时',
+    'settings.minute': '分',
     
     // 命令
     'commands.addDailyTask': '手动添加今日任务',
@@ -242,6 +250,10 @@ const translationsEN: Record<TranslationKey, string> = {
     'template.dateWithIcon': 'Current date with icon',
     'settings.basicSettings': 'Basic',
     'settings.templateSettings': 'Templates',
+    'settings.scheduledTime': '⏰ Scheduled Time',
+    'settings.scheduledTime.desc': 'Set the specific time for daily task auto-generation',
+    'settings.hour': 'Hour',
+    'settings.minute': 'Minute',
     
     // 命令
     'commands.addDailyTask': 'Add today\'s task manually',

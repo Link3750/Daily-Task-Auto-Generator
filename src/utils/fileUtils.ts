@@ -170,9 +170,7 @@ export function getTaskFilePath(rootDir: string): string {
         monthName = chineseMonths[monthIndex];
     }
     
-    const monthFile = `${monthName}.md`;
-    
-    return normalizePath(`${rootDir}/${yearDir}/${monthFile}`);
+    return normalizePath(`${rootDir}/${yearDir}年${monthName}/${new Date().toISOString().split('T')[0]}.md`);
 }
 
 /**
