@@ -239,7 +239,7 @@ export function getYesterdayTaskFilePath(rootDir: string): string {
     
     const monthFile = `${monthName}.md`;
     
-    return normalizePath(`${rootDir}/${yearDir}/${monthFile}`);
+    return normalizePath(`${rootDir}/${yearDir}年${monthName}/${new Date().toLocaleDateString().split('T')[0]}.md`);
 }
 
 /**
